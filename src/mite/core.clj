@@ -2,7 +2,8 @@
   (:require [cheshire.core :as json]
             [clj-time.core :as time]
             [clj-time.format :as fmt]
-            [hawk.core :as hawk])
+            [hawk.core :as hawk]
+            [clojure.string :as str])
   (:gen-class))
 
 (defn read-config [file]
@@ -12,10 +13,20 @@
 (defn current-timestamp []
   (fmt/unparse (fmt/formatters :date-time) (time/now)))
 
+(defn create-change-event [path file kind]
+  {:path path
+   :file file
+   :timestamp (current-timestamp)
+   :kind kind})
+
 (defn handle-event [ctx event]
-  (let [kind (event :kind)
-        path (event :file)]
-    (println (str "Event: " kind " - " path)))
+  (let [kind (name (:kind event))
+        file-path (str (:file event))
+        components (str/split file-path #"/")
+        path (str/join "/" (butlast components))
+        file (last components)]
+    (let [change-event (create-change-event path file kind)]
+      (println (json/generate-string change-event))))
   ctx)
 
 (defn monitor-paths [paths]
