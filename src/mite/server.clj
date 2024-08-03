@@ -1,5 +1,6 @@
 (ns mite.server
   (:require [ring.adapter.jetty :refer [run-jetty]]
+            [ring.middleware.cors :refer [wrap-cors]]
             [ring.util.response :as response]
             [cheshire.core :as json]
             [clojure.core.async :refer [go >! <! chan]]))
@@ -13,14 +14,13 @@
 (def events-chan (chan))
 
 (defn sse-handler [request]
-  (let [response (response/response "")
-        output-stream (:body response)]
-    (-> response
-        (response/content-type "text/event-stream")
-        (response/charset "UTF-8")
-        (response/header "Cache-Control" "no-cache")
-        (response/header "Connection" "keep-alive")
-        (assoc :body output-stream))
+  (let [output-stream (java.io.PipedWriter.)
+        input-stream (java.io.PipedReader. output-stream)
+        response (-> (response/response input-stream)
+                     (response/content-type "text/event-stream")
+                     (response/charset "UTF-8")
+                     (response/header "Cache-Control" "no-cache")
+                     (response/header "Connection" "keep-alive"))]
     (go-loop []
       (when-let [event (<! events-chan)]
         (binding [*out* output-stream]
@@ -29,7 +29,9 @@
     response))
 
 (defn start-server []
-  (run-jetty sse-handler {:port 3000 :join? false}))
+  (run-jetty (wrap-cors sse-handler :access-control-allow-origin [#"http://localhost:8000"]
+                        :access-control-allow-methods [:get])
+             {:port 3000 :join? false}))
 
 (defn send-event [event-data]
   (go (>! events-chan (json/generate-string event-data))))
