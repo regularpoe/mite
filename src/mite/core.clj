@@ -1,11 +1,16 @@
 (ns mite.core
   (:require [cheshire.core :as json]
+            [clj-time.core :as time]
+            [clj-time.format :as fmt]
             [hawk.core :as hawk])
   (:gen-class))
 
 (defn read-config [file]
   (let [content (slurp file)]
     (json/parse-string content true)))
+
+(defn current-timestamp []
+  (fmt/unparse (fmt/formatters :date-time) (time/now)))
 
 (defn handle-event [ctx event]
   (let [kind (event :kind)

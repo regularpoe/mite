@@ -6,6 +6,7 @@
   :dependencies [[org.clojure/clojure "1.11.1"]
                  [org.clojure/tools.namespace "1.5.0"]
                  [cheshire "5.13.0"]
+                 [clj-time "0.15.2"]
                  [hawk "0.2.11"]]
   :main ^:skip-aot mite.core
   :target-path "target/%s"
