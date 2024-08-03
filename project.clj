@@ -4,7 +4,9 @@
   :license {:name "GNU GENERAL PUBLIC LICENSE Version 3"
             :url ""}
   :dependencies [[org.clojure/clojure "1.11.1"]
-                 [org.clojure/tools.namespace "1.5.0"]]
+                 [org.clojure/tools.namespace "1.5.0"]
+                 [cheshire "5.13.0"]
+                 [hawk "0.2.11"]]
   :main ^:skip-aot mite.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all
