@@ -1,4 +1,4 @@
 {
-  "paths": ["/home/vedran"],
-  "poll_interval": 60
+  "paths": ["/home/vedran/code/mite", "/home/vedran/Desktop"],
+  "poll_interval": 5
 }
