@@ -3,8 +3,7 @@
             [clj-time.core :as time]
             [clj-time.format :as fmt]
             [hawk.core :as hawk]
-            [clojure.string :as str]
-            [mite.server :refer [send-event start-server]])
+            [clojure.string :as str])
   (:gen-class))
 
 (defn read-config [file]
@@ -27,8 +26,7 @@
         path (str/join "/" (butlast components))
         file (last components)]
     (let [change-event (create-change-event path file kind)]
-      (println (json/generate-string change-event))
-      (send-event change-event)))
+      (println (json/generate-string change-event))))
   ctx)
 
 (defn monitor-paths [paths]
@@ -40,7 +38,6 @@
         paths (:paths config)
         poll-interval (:poll_interval config)]
     (println "Monitoring paths:" paths "with poll interval:" poll-interval)
-    (start-server)
     (monitor-paths paths)
     (loop []
       (Thread/sleep (* poll-interval 1000))
